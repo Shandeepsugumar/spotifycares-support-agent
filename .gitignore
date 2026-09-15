@@ -1,7 +1,7 @@
 .env
 __pycache__/
 *.pyc
-historical_retrieval_corpus_LEAKAGE_SAFE.csv
 twcs/
 archive.zip
 *.log
+
