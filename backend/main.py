@@ -9,8 +9,10 @@ from groq import Groq
 if "GROQ_MODEL" not in os.environ:
     os.environ["GROQ_MODEL"] = "qwen/qwen3.8-27b"
 
-# Inject src folder into sys.path to reuse agent.py and retrieval.py
-sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
+current_file_path = os.path.abspath(__file__)
+backend_dir = os.path.dirname(current_file_path)
+repo_root_dir = os.path.dirname(backend_dir)
+sys.path.append(os.path.join(repo_root_dir, "src"))
 
 from agent import load_fewshot_examples, build_prompt, call_groq, validate_output, apply_policy_override
 from retrieval import Retriever
@@ -39,7 +41,7 @@ def startup_event():
     client = Groq(api_key=api_key)
     
     # Resolve paths reliably from backend/
-    base_dir = os.path.dirname(os.path.dirname(__file__))
+    base_dir = repo_root_dir
     retriever_path = os.path.join(base_dir, "historical_retrieval_corpus_LEAKAGE_SAFE.csv")
     fewshot_path = os.path.join(base_dir, "data", "fewshot_pool_FINAL.csv")
     
@@ -98,6 +100,8 @@ def classify(req: ClassifyRequest):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+
+
 
 
 
