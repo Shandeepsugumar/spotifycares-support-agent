@@ -27,7 +27,15 @@ function App() {
       })
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`)
+        if (response.status === 429) {
+          throw new Error("The demo is temporarily busy, please try again in a moment.");
+        }
+        let errorDetail = response.statusText;
+        try {
+           const errData = await response.json();
+           if (errData.detail) errorDetail = errData.detail;
+        } catch (e) {}
+        throw new Error(`API error: ${errorDetail}`);
       }
 
       const data = await response.json()
@@ -135,3 +143,4 @@ function App() {
 }
 
 export default App
+

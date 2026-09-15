@@ -6,6 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from groq import Groq
 
+if "GROQ_MODEL" not in os.environ:
+    os.environ["GROQ_MODEL"] = "openai/gpt-oss-20b"
+
 # Inject src folder into sys.path to reuse agent.py and retrieval.py
 sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
 
@@ -63,23 +66,20 @@ def classify(req: ClassifyRequest):
         prompt = build_prompt(fewshot_examples, req.message, evidence_records)
         
         # Call Groq
-        raw_output = call_groq(client, prompt, retries=1)
+        raw_output, call_err = call_groq(client, prompt, retries=1)
 
             
         # Validate output schema
+        if call_err:
+            if "429" in call_err or "quota" in call_err.lower():
+                raise HTTPException(status_code=429, detail="Rate limit or quota exceeded.")
+            raise HTTPException(status_code=502, detail=f"LLM Error: {call_err}")
+            
         validated, err = validate_output(raw_output, evidence_records)
         if err is not None:
-            # Hard fallback
-            validated = {
-                "intent": "general_inquiry_other",
-                "draft_reply": None,
-                "action": "escalate",
-                "reason": f"SYSTEM FALLBACK: {err}",
-                "evidence_ids": []
-            }
-        else:
-            # Apply deterministic policies (e.g. hacking, fraud rules)
-            validated = apply_policy_override(req.message, validated)
+            raise HTTPException(status_code=422, detail=f"Agent schema validation failed: {err}")
+            
+        validated = apply_policy_override(req.message, validated)
             
         return {
             "intent": validated["intent"],
@@ -96,4 +96,6 @@ def classify(req: ClassifyRequest):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+
+
 
