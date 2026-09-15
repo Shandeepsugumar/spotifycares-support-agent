@@ -6,6 +6,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
+  const [copied, setCopied] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -14,18 +15,19 @@ function App() {
     setLoading(true)
     setError(null)
     setResult(null)
+    setCopied(false)
 
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
     try {
-      const response = await fetch(`${apiUrl}/classify`, {
+      const response = await fetch(${apiUrl}/classify, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message })
       })
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`)
+        throw new Error(API error: )
       }
 
       const data = await response.json()
@@ -34,6 +36,14 @@ function App() {
       setError(err.message || 'An error occurred connecting to the backend.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleCopy = () => {
+    if (result && result.draft_reply) {
+      navigator.clipboard.writeText(result.draft_reply)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     }
   }
 
@@ -55,7 +65,7 @@ function App() {
             onChange={(e) => setMessage(e.target.value)}
             disabled={loading}
           />
-          <button type="submit" disabled={loading || !message.trim()}>
+          <button type="submit" className="submit-button" disabled={loading || !message.trim()}>
             {loading ? 'Analyzing...' : 'Analyze Message'}
           </button>
         </form>
@@ -68,7 +78,7 @@ function App() {
             
             <div className="result-field">
               <span className="label">Action:</span>
-              <span className={`badge ${result.action === 'escalate' ? 'escalate' : 'auto'}`}>
+              <span className={adge }>
                 {result.action === 'escalate' ? 'Escalate to Human' : 'Auto-Handle'}
               </span>
             </div>
@@ -80,7 +90,24 @@ function App() {
 
             <div className="result-field">
               <span className="label">Draft Reply:</span>
-              <div className="draft-reply">{result.draft_reply}</div>
+              <div className="draft-reply-container">
+                <div className="draft-reply">{result.draft_reply}</div>
+                {result.draft_reply && (
+                  <button 
+                    type="button" 
+                    className="copy-button" 
+                    onClick={handleCopy}
+                    title="Copy to clipboard"
+                  >
+                    {copied ? (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    )}
+                    <span>{copied ? 'Copied!' : 'Copy'}</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {result.reason && (
