@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from groq import Groq
 
 if "GROQ_MODEL" not in os.environ:
-    os.environ["GROQ_MODEL"] = "openai/gpt-oss-20b"
+    os.environ["GROQ_MODEL"] = "qwen/qwen3.8-27b"
 
 # Inject src folder into sys.path to reuse agent.py and retrieval.py
 sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
@@ -66,7 +66,7 @@ def classify(req: ClassifyRequest):
         prompt = build_prompt(fewshot_examples, req.message, evidence_records)
         
         # Call Groq
-        raw_output, call_err = call_groq(client, prompt, retries=1)
+        raw_output, call_err = call_groq(client, prompt)
 
             
         # Validate output schema
@@ -98,6 +98,10 @@ def classify(req: ClassifyRequest):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+
+
+
+
 
 
 
