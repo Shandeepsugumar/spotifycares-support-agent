@@ -20,14 +20,14 @@ function App() {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
     try {
-      const response = await fetch(${apiUrl}/classify, {
+      const response = await fetch(`${apiUrl}/classify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message })
       })
 
       if (!response.ok) {
-        throw new Error(API error: )
+        throw new Error(`API error: ${response.statusText}`)
       }
 
       const data = await response.json()
@@ -78,7 +78,7 @@ function App() {
             
             <div className="result-field">
               <span className="label">Action:</span>
-              <span className={adge }>
+              <span className={`badge ${result.action === 'escalate' ? 'escalate' : 'auto'}`}>
                 {result.action === 'escalate' ? 'Escalate to Human' : 'Auto-Handle'}
               </span>
             </div>
