@@ -92,9 +92,10 @@ For a full breakdown of these limitations and "what is misleading about the head
 ### Frontend (Vercel)
 1. Import this repository in Vercel.
 2. Set the Framework Preset to Vite and Root Directory to `frontend/`.
-3. Add an Environment Variable: `VITE_API_URL` pointing to the deployed Render backend URL (e.g., `https://your-backend.onrender.com`).
+3. Add an Environment Variable: `VITE_API_URL` pointing to the deployed Render backend URL (e.g., `https://spotifycares-demo-backend.onrender.com`).
 4. Deploy.
 
 
 ## Live Demo
 This demo defaults to qwen/qwen3.8-27b. openai/gpt-oss-20b (used for the graded evaluation results in reports/REPORT.md) was found to intermittently fail strict JSON validation in this live-request context during testing -- this does not affect or change any of the evaluated/reported numbers, which were independently verified against real batch runs.
+
