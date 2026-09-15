@@ -3,12 +3,16 @@
 ## Project Summary
 This project builds and evaluates an automated customer support agent for the SpotifyCares brand on Twitter. Using a carefully curated 181-row hand-labeled dataset and a 42k+ pair historical retrieval corpus, the project compares a naive baseline, a deterministic TF-IDF/keyword baseline, and an LLM-powered RAG Agent. The Agent leverages few-shot prompting, schema validation, and deterministic overrides to classify intents, draft evidence-grounded replies, and determine escalation risk, significantly outperforming the deterministic baselines while revealing crucial insights about LLM-as-a-judge reliability and rate-limit infrastructure bottlenecks.
 
-## Live Demo (optional, interactive testing)
+## Live Demo
+Try the agent live: https://spotifycares-support-agent-jade.vercel.app/
+Paste any customer support message and see the agent classify intent, draft a grounded reply, and decide whether to auto-handle or escalate -- in real time.
+
 This is a demo UI for interactively testing the agent pipeline in a browser. It wraps the same `agent.py`/`retrieval.py` logic already verified in the evaluation results. **It does not affect or change any reported numbers**, and is provided purely as a bonus/demo addition, not part of the graded evaluation deliverables.
 
-Once deployed, the live URLs will be:
-* **Frontend:** [PLACEHOLDER - fill in after deployment]
-* **Backend API:** [PLACEHOLDER - fill in after deployment]
+* **Frontend (try it here):** https://spotifycares-support-agent-jade.vercel.app/
+* **Backend API:** https://spotifycares-demo-backend.onrender.com
+
+This demo defaults to `qwen/qwen3.8-27b`. `openai/gpt-oss-20b` (used for the graded evaluation results in reports/REPORT.md) was found to intermittently fail strict JSON validation in this live-request context during testing -- this does not affect or change any of the evaluated/reported numbers, which were independently verified against real batch runs.
 
 *(Note: The backend is deployed on a free tier. The first request after idle time may take 10-30s due to cold start. This is expected behavior, not a bug.)*
 
@@ -52,7 +56,7 @@ python -c "import pandas as pd; from sklearn.metrics import accuracy_score, f1_s
 ### TIER 2 (Slow, API-Dependent)
 Re-running the Agent and LLM-as-a-Judge pipelines from scratch against the Groq API requires significant time and patience.
 * **Actual Observed Time:** Due to strict free-tier rate limits, the LLM calls required a ~9s/call pacing and consistently exhausted the daily API quota after ~100-150 calls. Completing the agent and judge runs took **multiple hours spanned across several days** (forcing mid-run model switches to bypass quotas).
-* **Important:** The 37-row Agent evaluation result and the 111-row Judge result are already saved in the `results/` folder. A fresh run is **NOT required** to see the reported numbersâ€”only to verify them independently. If you attempt a fresh run without a paid tier, expect heavy rate limits and hard halts.
+* **Important:** The 37-row Agent evaluation result and the 111-row Judge result are already saved in the `results/` folder. A fresh run is **NOT required** to see the reported numbersGÇöonly to verify them independently. If you attempt a fresh run without a paid tier, expect heavy rate limits and hard halts.
 * Commands to initiate a fresh run:
   ```bash
   python src/agent.py
@@ -82,20 +86,6 @@ Re-running the Agent and LLM-as-a-Judge pipelines from scratch against the Groq 
 For a full breakdown of these limitations and "what is misleading about the headline numbers", see Section 7 of the [Final Report](reports/REPORT.md).
 
 
-## Demo Deployment (Render + Vercel)
-### Backend (Render)
-1. Create a new Web Service on Render.
-2. Point it at the `backend/` directory of this repo.
-3. Start Command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-4. Add environment variables: `GROQ_API_KEY`, `GROQ_MODEL` (e.g. `meta-llama/llama-4-scout-17b-16e-instruct`).
-
-### Frontend (Vercel)
-1. Import this repository in Vercel.
-2. Set the Framework Preset to Vite and Root Directory to `frontend/`.
-3. Add an Environment Variable: `VITE_API_URL` pointing to the deployed Render backend URL (e.g., `https://spotifycares-demo-backend.onrender.com`).
-4. Deploy.
 
 
-## Live Demo
-This demo defaults to qwen/qwen3.8-27b. openai/gpt-oss-20b (used for the graded evaluation results in reports/REPORT.md) was found to intermittently fail strict JSON validation in this live-request context during testing -- this does not affect or change any of the evaluated/reported numbers, which were independently verified against real batch runs.
 
