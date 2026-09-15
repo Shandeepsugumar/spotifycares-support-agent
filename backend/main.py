@@ -6,8 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from groq import Groq
 
-if "GROQ_MODEL" not in os.environ:
-    os.environ["GROQ_MODEL"] = "qwen/qwen3.8-27b"
+os.environ["GROQ_MODEL"] = "qwen/qwen3.8-27b"
 
 current_file_path = os.path.abspath(__file__)
 backend_dir = os.path.dirname(current_file_path)
@@ -100,6 +99,7 @@ def classify(req: ClassifyRequest):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+
 
 
 
