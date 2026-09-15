@@ -64,8 +64,7 @@ def classify(req: ClassifyRequest):
         
         # Call Groq
         raw_output = call_groq(client, prompt, retries=1)
-        if not raw_output:
-            raise HTTPException(status_code=502, detail="Failed to get valid output from LLM")
+
             
         # Validate output schema
         validated, err = validate_output(raw_output, evidence_records)
@@ -73,9 +72,9 @@ def classify(req: ClassifyRequest):
             # Hard fallback
             validated = {
                 "intent": "general_inquiry_other",
-                "draft_reply": "I apologize, but I'm unable to process your request at the moment. Let me connect you with a specialist.",
+                "draft_reply": None,
                 "action": "escalate",
-                "reason": "Agent schema failure fallback",
+                "reason": f"SYSTEM FALLBACK: {err}",
                 "evidence_ids": []
             }
         else:
@@ -97,3 +96,4 @@ def classify(req: ClassifyRequest):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+
