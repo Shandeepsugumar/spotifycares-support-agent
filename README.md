@@ -3,6 +3,15 @@
 ## Project Summary
 This project builds and evaluates an automated customer support agent for the SpotifyCares brand on Twitter. Using a carefully curated 181-row hand-labeled dataset and a 42k+ pair historical retrieval corpus, the project compares a naive baseline, a deterministic TF-IDF/keyword baseline, and an LLM-powered RAG Agent. The Agent leverages few-shot prompting, schema validation, and deterministic overrides to classify intents, draft evidence-grounded replies, and determine escalation risk, significantly outperforming the deterministic baselines while revealing crucial insights about LLM-as-a-judge reliability and rate-limit infrastructure bottlenecks.
 
+## Live Demo (optional, interactive testing)
+This is a demo UI for interactively testing the agent pipeline in a browser. It wraps the same `agent.py`/`retrieval.py` logic already verified in the evaluation results. **It does not affect or change any reported numbers**, and is provided purely as a bonus/demo addition, not part of the graded evaluation deliverables.
+
+Once deployed, the live URLs will be:
+* **Frontend:** [PLACEHOLDER - fill in after deployment]
+* **Backend API:** [PLACEHOLDER - fill in after deployment]
+
+*(Note: The backend is deployed on a free tier. The first request after idle time may take 10-30s due to cold start. This is expected behavior, not a bug.)*
+
 ## Setup Instructions
 1. Clone this repository.
 2. Install the required Python packages:
@@ -71,3 +80,17 @@ Re-running the Agent and LLM-as-a-Judge pipelines from scratch against the Groq 
 * **Judge Unreliability:** The LLM judge exhibited **weak agreement with human ratings** on 3 out of 4 evaluation dimensions, meaning the LLM-judged "agent wins" conclusion carries real structural uncertainty.
 
 For a full breakdown of these limitations and "what is misleading about the headline numbers", see Section 7 of the [Final Report](reports/REPORT.md).
+
+
+## Demo Deployment (Render + Vercel)
+### Backend (Render)
+1. Create a new Web Service on Render.
+2. Point it at the `backend/` directory of this repo.
+3. Start Command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+4. Add environment variables: `GROQ_API_KEY`, `GROQ_MODEL` (e.g. `meta-llama/llama-4-scout-17b-16e-instruct`).
+
+### Frontend (Vercel)
+1. Import this repository in Vercel.
+2. Set the Framework Preset to Vite and Root Directory to `frontend/`.
+3. Add an Environment Variable: `VITE_API_URL` pointing to the deployed Render backend URL (e.g., `https://your-backend.onrender.com`).
+4. Deploy.
