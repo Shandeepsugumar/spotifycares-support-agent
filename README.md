@@ -12,9 +12,24 @@ This is a demo UI for interactively testing the agent pipeline in a browser. It 
 * **Frontend (try it here):** https://spotifycares-support-agent-jade.vercel.app/
 * **Backend API:** https://spotifycares-demo-backend.onrender.com
 
+**(Verified working as of 2026-09-16.)**
+
+
 This demo defaults to `qwen/qwen3.8-27b`. `openai/gpt-oss-20b` (used for the graded evaluation results in reports/REPORT.md) was found to intermittently fail strict JSON validation in this live-request context during testing -- this does not affect or change any of the evaluated/reported numbers, which were independently verified against real batch runs.
 
 *(Note: The backend is deployed on a free tier. The first request after idle time may take 10-30s due to cold start. This is expected behavior, not a bug.)*
+
+
+## Additional Exploration: BERT-Based Classification
+
+We also tested whether a BERT-embedding-based classifier (no LLM calls needed at 
+inference time) could match or beat our TF-IDF baseline for intent classification. 
+It underperformed on our small dataset (42.4% vs. 51.0% accuracy) -- likely due to 
+having only ~30 dev-fold examples to train on, not a flaw in the approach itself. 
+See `reports/DECISION_LOG.md` for the full analysis and reasoning, and 
+`reports/REPORT.md`'s Next Steps section for why this is a promising direction 
+worth revisiting with more labeled data (faster, cheaper inference at scale once 
+enough training data exists).
 
 ## Setup Instructions
 1. Clone this repository.
@@ -56,7 +71,7 @@ python -c "import pandas as pd; from sklearn.metrics import accuracy_score, f1_s
 ### TIER 2 (Slow, API-Dependent)
 Re-running the Agent and LLM-as-a-Judge pipelines from scratch against the Groq API requires significant time and patience.
 * **Actual Observed Time:** Due to strict free-tier rate limits, the LLM calls required a ~9s/call pacing and consistently exhausted the daily API quota after ~100-150 calls. Completing the agent and judge runs took **multiple hours spanned across several days** (forcing mid-run model switches to bypass quotas).
-* **Important:** The 37-row Agent evaluation result and the 111-row Judge result are already saved in the `results/` folder. A fresh run is **NOT required** to see the reported numbersGÇöonly to verify them independently. If you attempt a fresh run without a paid tier, expect heavy rate limits and hard halts.
+* **Important:** The 37-row Agent evaluation result and the 111-row Judge result are already saved in the `results/` folder. A fresh run is **NOT required** to see the reported numbers--only to verify them independently. If you attempt a fresh run without a paid tier, expect heavy rate limits and hard halts.
 * Commands to initiate a fresh run:
   ```bash
   python src/agent.py
@@ -84,6 +99,7 @@ Re-running the Agent and LLM-as-a-Judge pipelines from scratch against the Groq 
 * **Judge Unreliability:** The LLM judge exhibited **weak agreement with human ratings** on 3 out of 4 evaluation dimensions, meaning the LLM-judged "agent wins" conclusion carries real structural uncertainty.
 
 For a full breakdown of these limitations and "what is misleading about the headline numbers", see Section 7 of the [Final Report](reports/REPORT.md).
+
 
 
 

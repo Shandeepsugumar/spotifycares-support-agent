@@ -8,3 +8,19 @@
 * **Judge Model Choice:** Specifically selected `qwen/qwen3.8-27b` to serve as the LLM-judge because it belongs to a different model family than the agent backends, mitigating self-preference bias.
 * **Undefined Kappa Reporting:** Decided to report the Safety kappa honestly as "undefined" rather than artificially claiming a 1.0 or 0.0, preserving statistical integrity in the face of zero-variance data (no violations flagged by either side).
 * **Process Rigor via Independent Verification:** Caught and fixed three major bugs via independent verification scripts, not by chance: a Pandas `NaN` merge deduplication bug that dropped valid rows, a judge duplicate-write bug, and a corrupted header-row-as-data artifact in `agent_predictions_merged.csv` (which corrected the row count from 46 to 45 while keeping the valid-schema count unchanged at 37).
+* **BERT Embedding Classifier Experiment (Negative Result, Documented):** Tested 
+  a frozen BERT-embedding (all-MiniLM-L6-v2) + logistic regression classifier as 
+  an alternative to keyword+TF-IDF intent classification. Result: 42.4% accuracy 
+  / 0.284 macro F1, underperforming Baseline B's TF-IDF approach (51.0% / 0.5037) 
+  on the same 151-row test fold. Root cause identified: the dev fold has only 
+  ~30 examples across 7 classes (~4 per class), which is insufficient for a 
+  statistical classifier to learn reliable decision boundaries from embeddings 
+  alone -- unlike TF-IDF's hard keyword matching or the LLM agent's few-shot 
+  reasoning, a from-scratch classifier has no fallback when trained on too little 
+  data. Hypothesis (not verified in this project): with a substantially larger 
+  labeled dataset (likely low hundreds of examples per class or more), BERT 
+  embeddings would plausibly outperform both TF-IDF and possibly approach LLM-based 
+  classification, while being far cheaper and faster at inference time (no API 
+  call, no rate limits, runs locally in milliseconds). Not pursued further due to 
+  labeled-data constraints in this project's scope; documented as a candidate 
+  next step given more data.
