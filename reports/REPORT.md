@@ -84,3 +84,14 @@ The conclusion that "the Agent significantly outperforms the baselines" carries 
 * **Infrastructure:** Secure a paid API tier or implement a multi-key pool to successfully evaluate the agent on the full 151-row test fold, and validate the new adaptive pacing logic live.
 * **Consistency:** Re-run the entire evaluation utilizing a single, consistent model backend rather than mixing models mid-run.
 * **Judge Anchoring:** Hand-author `acceptable_reply_points` and `forbidden_claims` for each example in the golden set to explicitly anchor the judge and correct its blindness to hallucinations.
+* **Explore BERT-embedding classification at scale:** We tested a lightweight 
+  BERT-embedding + logistic regression classifier as a faster, cheaper 
+  alternative to LLM-based classification. It underperformed our TF-IDF baseline 
+  (42.4% vs. 51.0% accuracy) in this project, but the likely cause is data volume, 
+  not the technique itself: our dev fold has only ~30 examples, which is too few 
+  for a classifier to learn from embeddings alone without an LLM's reasoning to 
+  compensate. With a larger labeled dataset, we hypothesize this approach could 
+  match or exceed both baseline and LLM-based accuracy, while running orders of 
+  magnitude faster (local inference, no API rate limits) -- a meaningful advantage 
+  for production-scale deployment. This tradeoff (data volume vs. inference cost) 
+  is worth revisiting if more labeled data becomes available.
